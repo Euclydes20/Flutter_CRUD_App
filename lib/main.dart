@@ -1,7 +1,7 @@
+import 'package:crud_app/screens/home.dart';
 import 'package:crud_app/screens/security/login/login.dart';
 import 'package:crud_app/models/security/session.dart';
 import 'package:flutter/material.dart';
-import "package:crud_app/screens/users/user_list.dart";
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +16,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       //theme: ThemeData.dark(),
       home: Scaffold(
-        body: Session.isValid() ? const UserListPage() : const LoginPage(),
+        //Session.isValid() ? const HomePage() : const LoginPage()
+        body: LoginPage(
+          key: Key("/${const LoginPage().runtimeType.toString()}"),
+        ),
       ),
     );
   }

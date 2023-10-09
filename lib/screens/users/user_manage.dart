@@ -1,5 +1,6 @@
 import 'package:crud_app/models/users/user.dart';
 import 'package:crud_app/services/user_service.dart';
+import 'package:crud_app/widgets/my_scaffold.dart';
 import 'package:flutter/material.dart';
 
 class UserManagePage extends StatefulWidget {
@@ -42,10 +43,9 @@ class _UserManagePageState extends State<UserManagePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEdit ? "CRUD App - Edit User" : "CRUD App - Add User"),
-      ),
+    return MyScaffold(
+      showDrawer: false,
+      title: isEdit ? "CRUD App - Edit User" : "CRUD App - Add User",
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [

@@ -1,5 +1,6 @@
 import 'package:crud_app/models/configuration/configuration.dart';
 import 'package:crud_app/models/security/session.dart';
+import 'package:crud_app/screens/home.dart';
 import 'package:crud_app/screens/users/user_list.dart';
 import 'package:crud_app/services/configuration/configuration_service.dart';
 import 'package:crud_app/services/security/login_service.dart';
@@ -22,7 +23,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    Session.destroySession();
     super.initState();
     loadServerUrl();
   }
@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
                   hintText: "Login",
                   border: const OutlineInputBorder(),
                   labelText: "Login",
-                  errorText: !isValidLogin ? "Login is Required" : null,
+                  errorText: !isValidLogin ? "Login is required" : null,
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                   hintText: "Password",
                   border: const OutlineInputBorder(),
                   labelText: "Password",
-                  errorText: !isValidPassword ? "Password is Required" : null,
+                  errorText: !isValidPassword ? "Password is required" : null,
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -183,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
         loginController.text = "";
         passwordController.text = "";
         showSuccessMessage(response.message);
-        navigateToUserListPage();
+        navigateToHomePage();
       } else {
         showErrorMessage("Invalid session.");
       }
@@ -196,11 +196,29 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void navigateToUserListPage() {
+  void navigateToHomePage() {
     final route = MaterialPageRoute(
-      builder: (context) => const UserListPage(),
+      builder: (context) => const HomePage(),
+      settings: RouteSettings(
+        name: "/${const HomePage().runtimeType.toString()}",
+      ),
     );
-    Navigator.push(context, route).then((value) => Session.destroySession());
+    Navigator.push(context, route).then((value) {
+      setState(() {
+        isLoading = false;
+        isValidLogin = true;
+        isValidPassword = true;
+        isValidAccess = false;
+      });
+      Session.destroySession();
+    });
+    /*Navigator.pushAndRemoveUntil(context, route, (r) {
+      bool teste = r.settings.name == "/" ||
+          r.settings.name == "/${const UserListPage().runtimeType.toString()}";
+      print(r.settings.name);
+      print(teste);
+      return teste;
+    }).then((value) => Session.destroySession());*/
   }
 
   void showSuccessMessage(String message) {
@@ -258,6 +276,11 @@ class _LoginPageState extends State<LoginPage> {
 
     if (response.success) {
       Configuration.baseUrl = response.data!;
+      if (!Session.isValid()) {
+        Session.destroySession();
+      } else {
+        navigateToHomePage();
+      }
       setState(() {
         isLoading = false;
       });

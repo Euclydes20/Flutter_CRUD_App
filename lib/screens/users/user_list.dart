@@ -1,6 +1,7 @@
 import 'package:crud_app/models/users/user.dart';
 import 'package:crud_app/screens/users/user_manage.dart';
 import 'package:crud_app/services/user_service.dart';
+import 'package:crud_app/widgets/my_scaffold.dart';
 import 'package:flutter/material.dart';
 
 class UserListPage extends StatefulWidget {
@@ -22,44 +23,8 @@ class _UserListPageState extends State<UserListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("CRUD App - Users List"),
-        actions: [
-          ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Icon(Icons.exit_to_app))
-        ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.green,
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.view_module),
-                  Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text(
-                      "Modules",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.supervised_user_circle),
-              title: const Text('Users'),
-              onTap: () {},
-            ),
-          ],
-        ),
-      ),
+    return MyScaffold(
+      title: "CRUD App - Users List",
       body: Visibility(
         visible: isLoading,
         replacement: RefreshIndicator(
@@ -128,8 +93,12 @@ class _UserListPageState extends State<UserListPage> {
   }
 
   Future<void> navigateToUserManagePage([user]) async {
+    final userManagePage = UserManagePage(user: user);
     final route = MaterialPageRoute(
-      builder: (context) => UserManagePage(user: user),
+      builder: (context) => userManagePage,
+      settings: RouteSettings(
+        name: "/${userManagePage.runtimeType.toString()}",
+      ),
     );
     await Navigator.push(context, route);
     setState(() {
