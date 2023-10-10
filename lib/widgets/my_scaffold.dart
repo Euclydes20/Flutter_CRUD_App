@@ -98,7 +98,7 @@ class MyScaffold extends StatelessWidget {
                       size: 24,
                     ),
                     title: const Text(
-                      'Users',
+                      'Annotations',
                       style: TextStyle(
                         fontSize: 16,
                       ),
