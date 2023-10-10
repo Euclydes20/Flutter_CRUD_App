@@ -6,9 +6,11 @@ import 'package:crud_app/models/security/session.dart';
 import 'package:http/http.dart' as http;
 
 class LoginService {
-  static Map<String, String> headers = {
-    "Content-Type": "application/json",
-  };
+  static Map<String, String> getHeaders() {
+    return {
+      "Content-Type": "application/json",
+    };
+  }
 
   static String url = "v1/Authentication";
 
@@ -21,7 +23,7 @@ class LoginService {
           .post(
             Uri.parse("${Configuration.baseUrl}/$url/Authenticate"),
             body: jsonEncode(login),
-            headers: headers,
+            headers: getHeaders(),
           )
           .timeout(const Duration(seconds: 5));
       responseInfo.statusCode = response.statusCode;

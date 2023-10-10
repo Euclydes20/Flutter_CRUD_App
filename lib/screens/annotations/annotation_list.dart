@@ -1,39 +1,40 @@
-import 'package:crud_app/models/users/user.dart';
-import 'package:crud_app/screens/users/user_manage.dart';
-import 'package:crud_app/services/users/user_service.dart';
+import 'package:crud_app/models/annotations/annotation.dart';
+import 'package:crud_app/models/security/session.dart';
+import 'package:crud_app/screens/annotations/annotation_manage.dart';
+import 'package:crud_app/services/annotations/annotation_service.dart';
 import 'package:crud_app/widgets/my_scaffold.dart';
 import 'package:flutter/material.dart';
 
-class UserListPage extends StatefulWidget {
-  const UserListPage({super.key});
+class AnnotationListPage extends StatefulWidget {
+  const AnnotationListPage({super.key});
 
   @override
-  State<UserListPage> createState() => _UserListPageState();
+  State<AnnotationListPage> createState() => _AnnotationListPageState();
 }
 
-class _UserListPageState extends State<UserListPage> {
+class _AnnotationListPageState extends State<AnnotationListPage> {
   bool isLoading = true;
-  List<User> users = [];
+  List<Annotation> annotations = [];
 
   @override
   void initState() {
     super.initState();
-    fetchUsers();
+    fetchAnnotations();
   }
 
   @override
   Widget build(BuildContext context) {
     return MyScaffold(
-      title: "CRUD App - Users List",
+      title: "CRUD App - Annotations List",
       body: Visibility(
         visible: isLoading,
         replacement: RefreshIndicator(
-          onRefresh: fetchUsers,
+          onRefresh: fetchAnnotations,
           child: Visibility(
-            visible: users.isNotEmpty,
+            visible: annotations.isNotEmpty,
             replacement: Center(
               child: Text(
-                "No Users",
+                "No Annotations",
                 style: Theme.of(context).textTheme.displaySmall,
               ),
             ),
@@ -41,24 +42,24 @@ class _UserListPageState extends State<UserListPage> {
               physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
               ),
-              itemCount: users.length,
+              itemCount: annotations.length,
               padding: const EdgeInsets.all(8),
               itemBuilder: (context, index) {
-                final user = users[index];
-                final userId = user.id.toString();
+                final annotation = annotations[index];
+                final annotationId = annotation.id.toString();
                 return Card(
                   child: ListTile(
                     leading: CircleAvatar(child: Text("${index + 1}")),
-                    title: Text(user.login),
-                    subtitle: Text(user.name),
+                    title: Text(annotation.title),
+                    subtitle: Text(annotation.text),
                     trailing: PopupMenuButton(
                       onSelected: (value) {
                         switch (value) {
                           case "edit":
-                            navigateToUserManagePage(user);
+                            navigateToAnnotationManagePage(annotation);
                             break;
                           case "remove":
-                            removeUser(userId);
+                            removeAnnotation(annotationId);
                             break;
                         }
                       },
@@ -86,42 +87,42 @@ class _UserListPageState extends State<UserListPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: navigateToUserManagePage,
-        label: const Text("Add User"),
+        onPressed: navigateToAnnotationManagePage,
+        label: const Text("Add Annotation"),
       ),
     );
   }
 
-  Future<void> navigateToUserManagePage([user]) async {
-    final userManagePage = UserManagePage(user: user);
+  Future<void> navigateToAnnotationManagePage([annotation]) async {
+    final annotationManagePage = AnnotationManagePage(annotation: annotation);
     final route = MaterialPageRoute(
-      builder: (context) => userManagePage,
+      builder: (context) => annotationManagePage,
       settings: RouteSettings(
-        name: "/${userManagePage.runtimeType.toString()}",
+        name: "/${annotationManagePage.runtimeType.toString()}",
       ),
     );
-    await Navigator.push(context, route);
+    final reloadAnnotations = await Navigator.push(context, route);
     setState(() {
       isLoading = true;
     });
-    fetchUsers();
+    if (Session.isValid()) fetchAnnotations();
   }
 
-  Future<void> removeUser(String userId) async {
+  Future<void> removeAnnotation(annotationId) async {
     await showDialog(
         barrierDismissible: false,
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text("Warning"),
-            content: const Text("Are you sure want to remove this user?"),
+            content: const Text("Are you sure want to remove this annotation?"),
             actions: [
               TextButton(
                 onPressed: () async {
-                  final response = await UserService.delete(userId);
+                  final response = await AnnotationService.delete(annotationId);
                   if (response.success) {
                     showSuccessMessage(response.message);
-                    fetchUsers();
+                    fetchAnnotations();
                   } else {
                     showErrorMessage(response.message);
                   }
@@ -140,17 +141,17 @@ class _UserListPageState extends State<UserListPage> {
         });
   }
 
-  Future<void> fetchUsers() async {
+  Future<void> fetchAnnotations() async {
     setState(() {
       isLoading = true;
     });
 
-    final response = await UserService.getAll();
+    final response = await AnnotationService.getAll();
 
     if (response.success) {
-      final usersList = response.data;
+      final annotationsList = response.data;
       setState(() {
-        users = usersList?.where((user) => !user.superUser).toList() ?? [];
+        annotations = annotationsList!;
       });
     } else {
       showErrorMessage(response.message);

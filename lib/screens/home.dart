@@ -1,3 +1,5 @@
+import 'package:crud_app/auxiliary/constants.dart';
+import 'package:crud_app/screens/annotations/annotation_list.dart';
 import 'package:crud_app/screens/users/user_list.dart';
 import 'package:crud_app/widgets/my_scaffold.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +19,9 @@ class _HomePageState extends State<HomePage> {
       "icon": Icons.supervised_user_circle
     },
     {
-      "page": UserListPage(),
-      "name": "Users",
-      "icon": Icons.supervised_user_circle
+      "page": AnnotationListPage(),
+      "name": "Annotations",
+      "icon": Icons.note_alt,
     }
   ];
 
@@ -35,27 +37,32 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(8.0),
             child: Container(
               decoration: const BoxDecoration(
-                  border: Border.fromBorderSide(
-                    BorderSide(width: 2),
-                  ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(45),
-                  ),
-                  color: Colors.green),
-              child: Center(
-                child: ElevatedButton.icon(
-                  onPressed: () => navigateToPage(context, item["page"]),
-                  icon: Icon(item["icon"]),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size.infinite,
-                    elevation: 0.0,
-                    backgroundColor: Colors.transparent,
-                    disabledBackgroundColor: Colors.transparent,
-                  ),
-                  label: Text(
-                    item["name"],
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
+                border: Border.fromBorderSide(
+                  BorderSide(width: 2),
+                ),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(45),
+                ),
+                color: Colors.green,
+              ),
+              child: ElevatedButton(
+                onPressed: () => navigateToPage(context, item["page"]),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size.infinite,
+                  elevation: 0.0,
+                  backgroundColor: Colors.transparent,
+                  disabledBackgroundColor: Colors.transparent,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(item["icon"]),
+                    Text(
+                      item["name"],
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -66,26 +73,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   void navigateToPage(context, page) {
+    final pageName = "/${page.runtimeType.toString()}";
+    if (pageName == ModalRoute.of(context)!.settings.name) return;
+
     final route = MaterialPageRoute(
       builder: (context) => page,
       settings: RouteSettings(
-        name: "/${page.runtimeType.toString()}",
+        name: pageName,
       ),
     );
-    Navigator.push(context, route);
+    //Navigator.push(context, route);
 
-    //var teste = ModalRoute.of(context)!.settings.name;
-    //if (route.isCurrent) return;
-    //Navigator.of(context).pushNamed("/${page.runtimeType.toString()}");
-
-    /*Navigator.pushAndRemoveUntil(context, route, (r) {
-      bool teste = r.settings.name == "/" ||
-          r.isCurrent ||
-          r.settings.name != "/${runtimeType.toString()}" ||
-          r.settings.name == "/${page.runtimeType.toString()}";
-      print(r.settings.name);
-      print(teste);
-      return teste;
-    });*/
+    Navigator.pushAndRemoveUntil(context, route, (r) {
+      bool stopRemoving = r.settings.name == "/" ||
+          r.settings.name == "" ||
+          r.settings.name == null ||
+          r.settings.name == Constants.homePageRoute;
+      return stopRemoving;
+    });
   }
 }

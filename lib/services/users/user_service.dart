@@ -7,10 +7,12 @@ import 'package:crud_app/models/users/user.dart';
 import 'package:http/http.dart' as http;
 
 class UserService {
-  static Map<String, String> headers = {
-    "authorization": "bearer ${Session.token}",
-    "Content-Type": "application/json",
-  };
+  static Map<String, String> getHeaders() {
+    return {
+      "authorization": "bearer ${Session.token}",
+      "Content-Type": "application/json",
+    };
+  }
 
   static String url = "v1/User";
 
@@ -22,7 +24,7 @@ class UserService {
           .post(
             Uri.parse("${Configuration.baseUrl}/$url"),
             body: jsonEncode(user),
-            headers: headers,
+            headers: getHeaders(),
           )
           .timeout(const Duration(seconds: 5));
       responseInfo.statusCode = response.statusCode;
@@ -57,7 +59,7 @@ class UserService {
           .put(
             Uri.parse("${Configuration.baseUrl}/$url"),
             body: jsonEncode(user),
-            headers: headers,
+            headers: getHeaders(),
           )
           .timeout(const Duration(seconds: 5));
       responseInfo.statusCode = response.statusCode;
@@ -91,7 +93,7 @@ class UserService {
       final response = await http
           .delete(
             Uri.parse("${Configuration.baseUrl}/$url/$userId"),
-            headers: headers,
+            headers: getHeaders(),
           )
           .timeout(const Duration(seconds: 5));
       responseInfo.statusCode = response.statusCode;
@@ -125,7 +127,7 @@ class UserService {
       final response = await http
           .get(
             Uri.parse("${Configuration.baseUrl}/$url"),
-            headers: headers,
+            headers: getHeaders(),
           )
           .timeout(const Duration(seconds: 5));
       responseInfo.statusCode = response.statusCode;
