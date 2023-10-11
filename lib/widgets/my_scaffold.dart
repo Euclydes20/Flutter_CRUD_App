@@ -1,4 +1,5 @@
 import 'package:crud_app/auxiliary/constants.dart';
+import 'package:crud_app/auxiliary/utilities.dart';
 import 'package:crud_app/models/security/session.dart';
 import 'package:crud_app/screens/annotations/annotation_list.dart';
 import 'package:crud_app/screens/home.dart';
@@ -40,71 +41,96 @@ class MyScaffold extends StatelessWidget {
       drawer: showDrawer
           ? Drawer(
               backgroundColor: Colors.blueGrey[200],
-              child: ListView(
-                padding: EdgeInsets.zero,
+              child: Column(
                 children: [
-                  const DrawerHeader(
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                    ),
-                    child: Row(
+                  Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.zero,
                       children: [
-                        Icon(Icons.view_module),
-                        Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Text(
-                            "Modules",
-                            style: TextStyle(fontSize: 20),
+                        const DrawerHeader(
+                          decoration: BoxDecoration(
+                            color: Colors.green,
                           ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.view_module),
+                              Padding(
+                                padding: EdgeInsets.only(left: 10),
+                                child: Text(
+                                  "Modules",
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.home,
+                            size: 24,
+                          ),
+                          title: const Text(
+                            'Home',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                          onTap: () =>
+                              navigateToPage(context, const HomePage()),
+                        ),
+                        const Divider(
+                          thickness: 1,
+                        ),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.supervised_user_circle,
+                            size: 24,
+                          ),
+                          title: const Text(
+                            'Users',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                          onTap: () =>
+                              navigateToPage(context, const UserListPage()),
+                        ),
+                        const Divider(
+                          thickness: 1,
+                        ),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.note_alt,
+                            size: 24,
+                          ),
+                          title: const Text(
+                            'Annotations',
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                          onTap: () => navigateToPage(
+                              context, const AnnotationListPage()),
                         ),
                       ],
                     ),
                   ),
+                  const Spacer(),
+                  const Divider(
+                    thickness: 1,
+                  ),
                   ListTile(
                     leading: const Icon(
-                      Icons.home,
+                      Icons.settings,
                       size: 24,
                     ),
                     title: const Text(
-                      'Home',
+                      'Configurations',
                       style: TextStyle(
                         fontSize: 16,
                       ),
                     ),
                     onTap: () => navigateToPage(context, const HomePage()),
-                  ),
-                  const Divider(
-                    thickness: 1,
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.supervised_user_circle,
-                      size: 24,
-                    ),
-                    title: const Text(
-                      'Users',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    onTap: () => navigateToPage(context, const UserListPage()),
-                  ),
-                  const Divider(
-                    thickness: 1,
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.note_alt,
-                      size: 24,
-                    ),
-                    title: const Text(
-                      'Annotations',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    onTap: () =>
-                        navigateToPage(context, const AnnotationListPage()),
                   ),
                 ],
               ),
@@ -115,6 +141,27 @@ class MyScaffold extends StatelessWidget {
   }
 
   void confirmLogout(context) {
+    Utilities.showQuestionDialog(
+      context,
+      title: "Warning",
+      text: "Are you sure want to logout?",
+      confirmText: "Logout",
+      cancelText: "Cancel",
+      onConfirmPress: () {
+        Session.destroySession();
+        Navigator.pop(context);
+        Navigator.popUntil(context, (r) {
+          bool stopRemoving = r.settings.name == "/" ||
+              r.settings.name == "" ||
+              r.settings.name == null;
+          return stopRemoving;
+        });
+      },
+      onCancelPress: () {
+        Navigator.pop(context);
+      },
+    );
+    return;
     showDialog(
       context: context,
       barrierDismissible: false,

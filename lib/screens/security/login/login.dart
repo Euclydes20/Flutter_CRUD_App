@@ -1,8 +1,8 @@
-import 'package:crud_app/models/configuration/configuration.dart';
+import 'package:crud_app/models/configurations/configuration.dart';
 import 'package:crud_app/models/security/session.dart';
 import 'package:crud_app/screens/home.dart';
 import 'package:crud_app/screens/users/user_list.dart';
-import 'package:crud_app/services/configuration/configuration_service.dart';
+import 'package:crud_app/services/configurations/configuration_service.dart';
 import 'package:crud_app/services/security/login_service.dart';
 import 'package:flutter/material.dart';
 

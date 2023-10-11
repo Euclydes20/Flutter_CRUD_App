@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:crud_app/models/configuration/configuration.dart';
+import 'package:crud_app/models/configurations/configuration.dart';
 import 'package:crud_app/models/response_model.dart';
 import 'package:crud_app/models/security/session.dart';
 import 'package:crud_app/models/users/user.dart';
