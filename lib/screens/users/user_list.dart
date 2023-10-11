@@ -31,11 +31,18 @@ class _UserListPageState extends State<UserListPage> {
           onRefresh: fetchUsers,
           child: Visibility(
             visible: users.isNotEmpty,
-            replacement: Center(
-              child: Text(
-                "No Users",
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
+            replacement: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Text(
+                      "No Users",
+                      style: Theme.of(context).textTheme.displaySmall,
+                    ),
+                  ),
+                ),
+              ],
             ),
             child: ListView.builder(
               physics: const BouncingScrollPhysics(

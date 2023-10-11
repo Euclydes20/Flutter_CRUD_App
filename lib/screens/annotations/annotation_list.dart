@@ -32,11 +32,18 @@ class _AnnotationListPageState extends State<AnnotationListPage> {
           onRefresh: fetchAnnotations,
           child: Visibility(
             visible: annotations.isNotEmpty,
-            replacement: Center(
-              child: Text(
-                "No Annotations",
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
+            replacement: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Text(
+                      "No Annotations",
+                      style: Theme.of(context).textTheme.displaySmall,
+                    ),
+                  ),
+                ),
+              ],
             ),
             child: ListView.builder(
               physics: const BouncingScrollPhysics(
