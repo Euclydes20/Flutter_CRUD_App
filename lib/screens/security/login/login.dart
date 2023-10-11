@@ -174,7 +174,7 @@ class _LoginPageState extends State<LoginPage> {
       isScrollControlled: true,
       constraints: const BoxConstraints(maxHeight: 500),
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext modalContext) {
         TextEditingController modalNameController = TextEditingController();
         TextEditingController modalLoginController = TextEditingController();
         TextEditingController modalPasswordController = TextEditingController();
@@ -182,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
             TextEditingController();
         bool isModalLoading = false;
         return StatefulBuilder(
-          builder: (BuildContext modelContext, StateSetter setModalState) {
+          builder: (BuildContext modalStateContext, StateSetter setModalState) {
             return WillPopScope(
               onWillPop: () async {
                 return !isModalLoading;
@@ -246,7 +246,7 @@ class _LoginPageState extends State<LoginPage> {
                               setModalState(() {
                                 isModalLoading = true;
                               });
-                              await registerNewAccount(user, modelContext);
+                              await registerNewAccount(user, modalStateContext);
                               setModalState(() {
                                 isModalLoading = false;
                               });
@@ -273,14 +273,16 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> registerNewAccount(user, modalContext) async {
+  Future<void> registerNewAccount(user, modalStateContext) async {
     final response = await UserService.add(user);
 
     if (response.success) {
-      showSuccessMessage(response.message, customContext: modalContext);
+      showSuccessMessage(response.message, customContext: modalStateContext);
+      loginController.text = "";
+      passwordController.text = "";
       Navigator.pop(context);
     } else {
-      showErrorMessage(response.message, customContext: modalContext);
+      showErrorMessage(response.message, customContext: modalStateContext);
     }
   }
 
