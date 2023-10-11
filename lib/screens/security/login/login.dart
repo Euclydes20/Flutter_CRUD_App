@@ -117,28 +117,60 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(color: Colors.blue),
                 ),
               ),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed:
-                      isLoading || !isValidAccess ? null : authenticateUser,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                            var settingsSavedJson =
+                                await getStringFromLocalStorage(
+                                    Constants.storageSettingsKey);
+                            Map<String, dynamic>? settingsSaved;
+
+                            try {
+                              settingsSaved = jsonDecode(settingsSavedJson);
+                            } catch (_) {
+                              removeKeyFromLocalStorage(
+                                  Constants.storageSettingsKey);
+                            }
+
+                            showSettingsModal(settingsSaved: settingsSaved);
+                          },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(16.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+                    child: const Icon(Icons.settings),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed:
+                          isLoading || !isValidAccess ? null : authenticateUser,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(16.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                      ),
+                      label: const Text(
+                        "Access",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      icon: isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            )
+                          : const Icon(Icons.login),
                     ),
                   ),
-                  label: const Text(
-                    "Access",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  icon: isLoading
-                      ? const CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 3,
-                        )
-                      : const Icon(Icons.login),
-                ),
+                ],
               ),
               const Spacer(),
               Row(
@@ -166,6 +198,97 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
+    );
+  }
+
+  void showSettingsModal({Map<String, dynamic>? settingsSaved}) {
+    showModalBottomSheet(
+      isDismissible: false,
+      isScrollControlled: true,
+      constraints: const BoxConstraints(maxHeight: 250),
+      context: context,
+      builder: (BuildContext modalContext) {
+        TextEditingController modalApiUriController = TextEditingController();
+        if (settingsSaved is Map<String, dynamic>) {
+          modalApiUriController.text = settingsSaved["apiUri"] ?? "";
+        }
+
+        bool isModalLoading = false;
+        return StatefulBuilder(
+          builder: (BuildContext modalStateContext, StateSetter setModalState) {
+            return WillPopScope(
+              onWillPop: () async {
+                return !isModalLoading;
+              },
+              child: MyScaffold(
+                showDrawer: false,
+                showBackButton: !isModalLoading,
+                showExitButton: false,
+                title: "Settings (Use in Development)",
+                body: ListView(
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    TextField(
+                      enabled: !isModalLoading,
+                      controller: modalApiUriController,
+                      decoration: const InputDecoration(hintText: "Api Uri"),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: !isModalLoading
+                          ? () {
+                              if (modalApiUriController.text.isEmpty) {
+                                showErrorMessage("Fail: Api Uri is required.");
+                                return;
+                              }
+                              setModalState(() {
+                                isModalLoading = true;
+                              });
+                              var settings = {
+                                "apiUri": modalApiUriController.text,
+                              };
+                              String settingsJson = "";
+                              try {
+                                settingsJson = jsonEncode(settings);
+                              } catch (_) {
+                                showErrorMessage("Fail: Invalid settings.");
+                                setModalState(() {
+                                  isModalLoading = false;
+                                });
+                                return;
+                              }
+                              saveStringToLocalStorage(
+                                Constants.storageSettingsKey,
+                                settingsJson,
+                              );
+                              Configuration.baseUrl = settings["apiUri"]!;
+                              setModalState(() {
+                                isModalLoading = false;
+                              });
+                              showSuccessMessage("Success: Settings Saved.");
+                              Navigator.pop(context);
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(16.0),
+                      ),
+                      label: const Text("Save"),
+                      icon: isModalLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            )
+                          : const Icon(Icons.save),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -384,6 +507,37 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       isLoading = true;
     });
+
+    /*final settingsSavedJson =
+        await getStringFromLocalStorage(Constants.storageSettingsKey);
+
+    if (settingsSavedJson.isNotEmpty) {
+      try {
+        Map<String, dynamic>? settingsSaved = jsonDecode(settingsSavedJson);
+        if (settingsSaved is Map<String, dynamic>) {
+          Configuration.baseUrl = settingsSaved["apiUri"] ?? "";
+        }
+      } catch (_) {
+        removeKeyFromLocalStorage(Constants.storageSettingsKey);
+        Session.destroySession();
+        removeKeyFromLocalStorage(Constants.storageSessionKey);
+        showErrorMessage("Fail: Api Uri configuration is inválid.");
+        showSettingsModal();
+      }
+    }
+
+    if (Configuration.baseUrl.isEmpty) {
+      Session.destroySession();
+      removeKeyFromLocalStorage(Constants.storageSessionKey);
+      showSettingsModal();
+      showSuccessMessage(
+          "First access to system, please configure the api uri.");
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+    return;*/
 
     final response = await ConfigurationService.getBaseUrl();
 
