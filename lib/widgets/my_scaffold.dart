@@ -152,6 +152,7 @@ class MyScaffold extends StatelessWidget {
       cancelText: "Cancel",
       onConfirmPress: () {
         Session.destroySession();
+        removeKeyFromLocalStorage(Constants.storageSessionKey);
         Navigator.pop(context);
         Navigator.popUntil(context, (r) {
           bool stopRemoving = r.settings.name == "/" ||

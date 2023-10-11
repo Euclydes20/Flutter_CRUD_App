@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crud_app/auxiliary/constants.dart';
 import 'package:crud_app/auxiliary/utilities.dart';
 import 'package:crud_app/models/configurations/configuration.dart';
 import 'package:crud_app/models/security/session.dart';
@@ -304,6 +307,10 @@ class _LoginPageState extends State<LoginPage> {
 
     if (response.success) {
       if (Session.isValid()) {
+        var sessionJson = jsonEncode(Session.getSession(
+          convertIncompatibleJsonFields: true,
+        ));
+        saveStringToLocalStorage(Constants.storageSessionKey, sessionJson);
         loginController.text = "";
         passwordController.text = "";
         showSuccessMessage(response.message);
@@ -386,7 +393,35 @@ class _LoginPageState extends State<LoginPage> {
       Configuration.baseUrl = response.data!;
       if (!Session.isValid()) {
         Session.destroySession();
+        String storageSessionJsonString =
+            await getStringFromLocalStorage(Constants.storageSessionKey);
+        if (storageSessionJsonString.isEmpty) {
+          removeKeyFromLocalStorage(Constants.storageSessionKey);
+        } else {
+          dynamic storageSessionJson;
+          try {
+            storageSessionJson = jsonDecode(storageSessionJsonString);
+            if (storageSessionJson != null) {
+              Session.registerSession(storageSessionJson, camelCase: true);
+            } else {
+              removeKeyFromLocalStorage(Constants.storageSessionKey);
+            }
+          } catch (_) {
+            storageSessionJson = null;
+            removeKeyFromLocalStorage(Constants.storageSessionKey);
+          }
+          if (!Session.isValid()) {
+            Session.destroySession();
+            removeKeyFromLocalStorage(Constants.storageSessionKey);
+          } else {
+            showSuccessMessage("Success: Session restaured.");
+            navigateToHomePage();
+          }
+        }
       } else {
+        var sessionJson = jsonEncode(Session.getSession());
+        saveStringToLocalStorage(Constants.storageSessionKey, sessionJson);
+        showSuccessMessage("Success: Session restaured.");
         navigateToHomePage();
       }
       setState(() {

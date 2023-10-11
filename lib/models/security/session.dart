@@ -37,7 +37,8 @@ class Session {
     );
   }*/
 
-  static Map<String, dynamic> getSession() {
+  static Map<String, dynamic> getSession(
+      {bool convertIncompatibleJsonFields = false}) {
     return <String, dynamic>{
       "userId": Session.userId,
       "userName": Session.userName,
@@ -45,19 +46,23 @@ class Session {
       "userSuper": Session.userSuper,
       "provisoryPassword": Session.provisoryPassword,
       "token": Session.token,
-      "expires": Session.expires,
+      "expires": convertIncompatibleJsonFields
+          ? Session.expires.toString()
+          : Session.expires,
     };
   }
 
-  static void registerSession(Map<String, dynamic> json) {
+  static void registerSession(Map<String, dynamic> json,
+      {bool camelCase = false}) {
     Session(
-      userId: json["UserId"],
-      userName: json["UserName"],
-      userLogin: json["UserLogin"],
-      userSuper: json["UserSuper"],
-      provisoryPassword: json["ProvisoryPassword"],
-      token: json["Token"],
-      expires: DateTime.parse(json["Expires"]),
+      userId: json[camelCase ? "userId" : "UserId"],
+      userName: json[camelCase ? "userName" : "UserName"],
+      userLogin: json[camelCase ? "userLogin" : "UserLogin"],
+      userSuper: json[camelCase ? "userSuper" : "UserSuper"],
+      provisoryPassword:
+          json[camelCase ? "provisoryPassword" : "ProvisoryPassword"],
+      token: json[camelCase ? "token" : "Token"],
+      expires: DateTime.parse(json[camelCase ? "expires" : "Expires"]),
     );
   }
 

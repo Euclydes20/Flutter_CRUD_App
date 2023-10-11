@@ -1,4 +1,5 @@
 import 'package:crud_app/auxiliary/constants.dart';
+import 'package:crud_app/auxiliary/utilities.dart';
 import 'package:crud_app/models/security/session.dart';
 import 'package:crud_app/screens/annotations/annotation_list.dart';
 import 'package:crud_app/screens/users/user_list.dart';
@@ -100,6 +101,7 @@ class _HomePageState extends State<HomePage> {
                   showErrorMessage(response.message);
                 }*/
                 Session.destroySession();
+                removeKeyFromLocalStorage(Constants.storageSessionKey);
                 Navigator.pop(context);
               },
               child: const Text("Logout"),
