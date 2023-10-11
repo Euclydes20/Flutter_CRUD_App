@@ -1,9 +1,13 @@
+import 'package:crud_app/auxiliary/utilities.dart';
 import 'package:crud_app/models/configurations/configuration.dart';
 import 'package:crud_app/models/security/session.dart';
+import 'package:crud_app/models/users/user.dart';
 import 'package:crud_app/screens/home.dart';
 import 'package:crud_app/screens/users/user_list.dart';
 import 'package:crud_app/services/configurations/configuration_service.dart';
 import 'package:crud_app/services/security/login_service.dart';
+import 'package:crud_app/services/users/user_service.dart';
+import 'package:crud_app/widgets/my_scaffold.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -142,7 +146,9 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   const Text("Does not have account?"),
                   ElevatedButton(
-                    onPressed: isLoading ? null : showInDevelopmentDialog,
+                    onPressed: isLoading
+                        ? null
+                        : showNewAccountModal, //showInDevelopmentDialog,
                     style: ElevatedButton.styleFrom(
                       elevation: 0.0,
                       backgroundColor: Colors.transparent,
@@ -160,6 +166,122 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  void showNewAccountModal() {
+    showModalBottomSheet(
+      isDismissible: false,
+      isScrollControlled: true,
+      constraints: const BoxConstraints(maxHeight: 500),
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController modalNameController = TextEditingController();
+        TextEditingController modalLoginController = TextEditingController();
+        TextEditingController modalPasswordController = TextEditingController();
+        TextEditingController modalBibliographyController =
+            TextEditingController();
+        bool isModalLoading = false;
+        return StatefulBuilder(
+          builder: (BuildContext modelContext, StateSetter setModalState) {
+            return WillPopScope(
+              onWillPop: () async {
+                return !isModalLoading;
+              },
+              child: MyScaffold(
+                showDrawer: false,
+                showBackButton: !isModalLoading,
+                showExitButton: false,
+                title: "Register New Account",
+                body: ListView(
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    TextField(
+                      enabled: !isModalLoading,
+                      controller: modalNameController,
+                      decoration: const InputDecoration(hintText: "Name"),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextField(
+                      enabled: !isModalLoading,
+                      controller: modalLoginController,
+                      decoration: const InputDecoration(hintText: "Login"),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextField(
+                      enabled: !isModalLoading,
+                      controller: modalPasswordController,
+                      decoration: const InputDecoration(hintText: "Password"),
+                      obscureText: true,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextField(
+                      enabled: !isModalLoading,
+                      controller: modalBibliographyController,
+                      decoration:
+                          const InputDecoration(hintText: "Bibliography"),
+                      keyboardType: TextInputType.multiline,
+                      minLines: 5,
+                      maxLines: 8,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: !isModalLoading
+                          ? () async {
+                              var user = {
+                                "name": modalNameController.text,
+                                "login": modalLoginController.text,
+                                "password": modalPasswordController.text,
+                                "bibliography": modalBibliographyController.text
+                              };
+                              setModalState(() {
+                                isModalLoading = true;
+                              });
+                              await registerNewAccount(user, modelContext);
+                              setModalState(() {
+                                isModalLoading = false;
+                              });
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(16.0),
+                      ),
+                      label: const Text("Register"),
+                      icon: isModalLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            )
+                          : const Icon(Icons.save),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> registerNewAccount(user, modalContext) async {
+    final response = await UserService.add(user);
+
+    if (response.success) {
+      showSuccessMessage(response.message, customContext: modalContext);
+      Navigator.pop(context);
+    } else {
+      showErrorMessage(response.message, customContext: modalContext);
+    }
   }
 
   Future<void> authenticateUser() async {
@@ -221,14 +343,14 @@ class _LoginPageState extends State<LoginPage> {
     }).then((value) => Session.destroySession());*/
   }
 
-  void showSuccessMessage(String message) {
-    ScaffoldMessenger.of(context).clearSnackBars();
+  void showSuccessMessage(String message, {BuildContext? customContext}) {
+    ScaffoldMessenger.of(customContext ?? context).clearSnackBars();
     final snackBar = SnackBar(content: Text(message));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(customContext ?? context).showSnackBar(snackBar);
   }
 
-  void showErrorMessage(String message) {
-    ScaffoldMessenger.of(context).clearSnackBars();
+  void showErrorMessage(String message, {BuildContext? customContext}) {
+    ScaffoldMessenger.of(customContext ?? context).clearSnackBars();
     final snackBar = SnackBar(
       content: Text(
         message,
@@ -238,33 +360,17 @@ class _LoginPageState extends State<LoginPage> {
       ),
       backgroundColor: Colors.red,
     );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(customContext ?? context).showSnackBar(snackBar);
   }
 
   void showInDevelopmentDialog() {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Row(
-              children: [
-                Icon(Icons.info),
-                Padding(
-                  padding: EdgeInsets.only(left: 10),
-                  child: Text("Information"),
-                ),
-              ],
-            ),
-            content: const Text("In development."),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Ok"),
-              ),
-            ],
-          );
-        });
+    showInformationDialog(
+      context,
+      title: "Information",
+      text: "In development.",
+      confirmText: "Ok",
+      onConfirmPress: () => Navigator.pop(context),
+    );
   }
 
   Future<void> loadServerUrl() async {

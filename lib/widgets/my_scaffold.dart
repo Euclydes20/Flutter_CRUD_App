@@ -10,6 +10,7 @@ class MyScaffold extends StatelessWidget {
   final String title;
   final Widget body;
   final Widget? floatingActionButton;
+  final bool showBackButton;
   final bool showExitButton;
   final bool showDrawer;
 
@@ -18,6 +19,7 @@ class MyScaffold extends StatelessWidget {
     required this.title,
     required this.body,
     this.floatingActionButton,
+    this.showBackButton = true,
     this.showExitButton = true,
     this.showDrawer = true,
   });
@@ -27,6 +29,7 @@ class MyScaffold extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
+        automaticallyImplyLeading: showBackButton,
         actions: showExitButton
             ? [
                 ElevatedButton(
@@ -141,7 +144,7 @@ class MyScaffold extends StatelessWidget {
   }
 
   void confirmLogout(context) {
-    Utilities.showQuestionDialog(
+    showQuestionDialog(
       context,
       title: "Warning",
       text: "Are you sure want to logout?",
@@ -159,45 +162,6 @@ class MyScaffold extends StatelessWidget {
       },
       onCancelPress: () {
         Navigator.pop(context);
-      },
-    );
-    return;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Warning"),
-          content: const Text("Are you sure want to logout?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                /*final response = await AnnotationService.delete(annotationId);
-                if (response.success) {
-                  showSuccessMessage(response.message);
-                  fetchAnnotations();
-                } else {
-                  showErrorMessage(response.message);
-                }*/
-                Session.destroySession();
-                Navigator.pop(context);
-                Navigator.popUntil(context, (r) {
-                  bool stopRemoving = r.settings.name == "/" ||
-                      r.settings.name == "" ||
-                      r.settings.name == null;
-                  return stopRemoving;
-                });
-              },
-              child: const Text("Logout"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("Cancel"),
-            ),
-          ],
-        );
       },
     );
   }

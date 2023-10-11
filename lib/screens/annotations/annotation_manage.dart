@@ -64,16 +64,18 @@ class _AnnotationManagePageState extends State<AnnotationManagePage> {
             height: 20,
           ),
           ElevatedButton.icon(
-              onPressed: isLoading ? null : saveData,
-              style:
-                  ElevatedButton.styleFrom(padding: const EdgeInsets.all(16.0)),
-              label: Text(isEdit ? "Edit" : "Add"),
-              icon: isLoading
-                  ? const CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 3,
-                    )
-                  : const Icon(Icons.save)),
+            onPressed: isLoading ? null : saveData,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.all(16.0),
+            ),
+            label: Text(isEdit ? "Edit" : "Add"),
+            icon: isLoading
+                ? const CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  )
+                : const Icon(Icons.save),
+          ),
           /*ElevatedButton(
             onPressed: saveData,
             child: Padding(
