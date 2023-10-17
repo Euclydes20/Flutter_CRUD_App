@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:crud_app/models/configurations/configuration.dart';
-import 'package:crud_app/models/response_model.dart';
-import 'package:crud_app/models/security/session.dart';
-import 'package:crud_app/models/users/user.dart';
+import 'package:crud_app/v1/models/configurations/configuration.dart';
+import 'package:crud_app/v1/models/response_model.dart';
+import 'package:crud_app/v1/models/security/session.dart';
+import 'package:crud_app/v1/models/users/user.dart';
 import 'package:http/http.dart' as http;
 
 class UserService {

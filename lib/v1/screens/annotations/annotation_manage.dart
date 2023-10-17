@@ -1,6 +1,6 @@
-import 'package:crud_app/models/annotations/annotation.dart';
-import 'package:crud_app/services/annotations/annotation_service.dart';
-import 'package:crud_app/widgets/my_scaffold.dart';
+import 'package:crud_app/v1/models/annotations/annotation.dart';
+import 'package:crud_app/v1/services/annotations/annotation_service.dart';
+import 'package:crud_app/v1/widgets/my_scaffold.dart';
 import 'package:flutter/material.dart';
 
 class AnnotationManagePage extends StatefulWidget {

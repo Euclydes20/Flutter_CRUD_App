@@ -1,4 +1,4 @@
-import 'package:crud_app/models/users/user.dart';
+import 'package:crud_app/v1/models/users/user.dart';
 
 class Annotation {
   final int id;

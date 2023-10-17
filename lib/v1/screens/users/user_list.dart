@@ -1,7 +1,7 @@
-import 'package:crud_app/models/users/user.dart';
-import 'package:crud_app/screens/users/user_manage.dart';
-import 'package:crud_app/services/users/user_service.dart';
-import 'package:crud_app/widgets/my_scaffold.dart';
+import 'package:crud_app/v1/models/users/user.dart';
+import 'package:crud_app/v1/screens/users/user_manage.dart';
+import 'package:crud_app/v1/services/users/user_service.dart';
+import 'package:crud_app/v1/widgets/my_scaffold.dart';
 import 'package:flutter/material.dart';
 
 class UserListPage extends StatefulWidget {

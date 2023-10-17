@@ -1,9 +1,9 @@
-import 'package:crud_app/auxiliary/constants.dart';
-import 'package:crud_app/auxiliary/utilities.dart';
-import 'package:crud_app/models/security/session.dart';
-import 'package:crud_app/screens/annotations/annotation_list.dart';
-import 'package:crud_app/screens/home.dart';
-import 'package:crud_app/screens/users/user_list.dart';
+import 'package:crud_app/v1/auxiliary/constants.dart';
+import 'package:crud_app/v1/auxiliary/utilities.dart';
+import 'package:crud_app/v1/models/security/session.dart';
+import 'package:crud_app/v1/screens/annotations/annotation_list.dart';
+import 'package:crud_app/v1/screens/home.dart';
+import 'package:crud_app/v1/screens/users/user_list.dart';
 import 'package:flutter/material.dart';
 
 class MyScaffold extends StatelessWidget {
