@@ -224,7 +224,7 @@ class _LoginPageState extends State<LoginPage> {
                 showDrawer: false,
                 showBackButton: !isModalLoading,
                 showExitButton: false,
-                title: "Settings (Use in Development)",
+                title: "Settings",
                 body: ListView(
                   padding: const EdgeInsets.all(20),
                   children: [
