@@ -202,18 +202,18 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void showSettingsModal({Map<String, dynamic>? settingsSaved}) {
+    TextEditingController modalApiUriController = TextEditingController();
+    if (settingsSaved is Map<String, dynamic>) {
+      modalApiUriController.text = settingsSaved["apiUri"] ?? "";
+    }
+    bool isModalLoading = false;
+
     showModalBottomSheet(
       isDismissible: false,
       isScrollControlled: true,
       constraints: const BoxConstraints(maxHeight: 250),
       context: context,
       builder: (BuildContext modalContext) {
-        TextEditingController modalApiUriController = TextEditingController();
-        if (settingsSaved is Map<String, dynamic>) {
-          modalApiUriController.text = settingsSaved["apiUri"] ?? "";
-        }
-
-        bool isModalLoading = false;
         return StatefulBuilder(
           builder: (BuildContext modalStateContext, StateSetter setModalState) {
             return WillPopScope(
@@ -343,18 +343,18 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
+    TextEditingController modalNameController = TextEditingController();
+    TextEditingController modalLoginController = TextEditingController();
+    TextEditingController modalPasswordController = TextEditingController();
+    TextEditingController modalBibliographyController = TextEditingController();
+    bool isModalLoading = false;
+
     showModalBottomSheet(
       isDismissible: false,
       isScrollControlled: true,
       constraints: const BoxConstraints(maxHeight: 500),
       context: context,
       builder: (BuildContext modalContext) {
-        TextEditingController modalNameController = TextEditingController();
-        TextEditingController modalLoginController = TextEditingController();
-        TextEditingController modalPasswordController = TextEditingController();
-        TextEditingController modalBibliographyController =
-            TextEditingController();
-        bool isModalLoading = false;
         return StatefulBuilder(
           builder: (BuildContext modalStateContext, StateSetter setModalState) {
             return WillPopScope(
