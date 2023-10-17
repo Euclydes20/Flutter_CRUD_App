@@ -228,10 +228,51 @@ class _LoginPageState extends State<LoginPage> {
                 body: ListView(
                   padding: const EdgeInsets.all(20),
                   children: [
-                    TextField(
-                      enabled: !isModalLoading,
-                      controller: modalApiUriController,
-                      decoration: const InputDecoration(hintText: "Api Uri"),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            enabled: !isModalLoading,
+                            controller: modalApiUriController,
+                            decoration:
+                                const InputDecoration(hintText: "Api Uri"),
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: isModalLoading
+                              ? null
+                              : () async {
+                                  setModalState(
+                                    () => isModalLoading = true,
+                                  );
+
+                                  final response =
+                                      await ConfigurationService.getBaseUrl();
+
+                                  if (response.success) {
+                                    modalApiUriController.text = response.data!;
+                                    showSuccessMessage(
+                                      response.message,
+                                    );
+                                  } else {
+                                    showErrorMessage(
+                                      response.message,
+                                    );
+                                  }
+
+                                  setModalState(
+                                    () => isModalLoading = false,
+                                  );
+                                },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.all(12.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(90),
+                            ),
+                          ),
+                          child: const Icon(Icons.search),
+                        ),
+                      ],
                     ),
                     const SizedBox(
                       height: 20,
@@ -293,6 +334,15 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void showNewAccountModal() {
+    if (Configuration.baseUrl.isEmpty) {
+      removeKeyFromLocalStorage(Constants.storageSettingsKey);
+      Session.destroySession();
+      removeKeyFromLocalStorage(Constants.storageSessionKey);
+      showSettingsModal();
+      showErrorMessage("Api Uri not configured.");
+      return;
+    }
+
     showModalBottomSheet(
       isDismissible: false,
       isScrollControlled: true,
@@ -415,6 +465,18 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
+    if (Configuration.baseUrl.isEmpty) {
+      await removeKeyFromLocalStorage(Constants.storageSettingsKey);
+      Session.destroySession();
+      await removeKeyFromLocalStorage(Constants.storageSessionKey);
+      showSettingsModal();
+      showErrorMessage("Api Uri not configured.");
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+
     final login = loginController.text;
     final password = passwordController.text;
 
@@ -508,7 +570,7 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
-    /*final settingsSavedJson =
+    final settingsSavedJson =
         await getStringFromLocalStorage(Constants.storageSettingsKey);
 
     if (settingsSavedJson.isNotEmpty) {
@@ -527,6 +589,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     if (Configuration.baseUrl.isEmpty) {
+      removeKeyFromLocalStorage(Constants.storageSettingsKey);
       Session.destroySession();
       removeKeyFromLocalStorage(Constants.storageSessionKey);
       showSettingsModal();
@@ -537,9 +600,9 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       isLoading = false;
     });
-    return;*/
+    return;
 
-    final response = await ConfigurationService.getBaseUrl();
+    /*final response = await ConfigurationService.getBaseUrl();
 
     if (response.success) {
       Configuration.baseUrl = response.data!;
@@ -581,7 +644,7 @@ class _LoginPageState extends State<LoginPage> {
       });
     } else {
       showFailGetServerUrlDialog();
-    }
+    }*/
   }
 
   Future<void> showFailGetServerUrlDialog() async {
